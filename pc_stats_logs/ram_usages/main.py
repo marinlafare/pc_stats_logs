@@ -23,6 +23,8 @@ async def gather_stats_pipeline():
         # import traceback
         # traceback.print_exc()
 
+
+
 async def main_loop(interval_seconds: int = 10):
     """
     Main loop to run the stats gathering pipeline periodically.
@@ -30,26 +32,9 @@ async def main_loop(interval_seconds: int = 10):
     Args:
         interval_seconds (int): The time interval (in seconds) between each run.
     """
-
     load_dotenv('.env')
     conn_string = os.getenv("CONN_STRING")
-
-    if not conn_string:
-        print("Error: CONN_STRING environment variable not set. Exiting.")
-        return
-
-    print("Initializing database...")
-    try:
-        await init_db(conn_string)
-        print("Database initialized successfully.")
-    except Exception as e:
-        print(f"Error during database initialization: {e}")
-        print("Exiting due to database initialization failure.")
-        return
-
-    print(f"Starting PC stats monitoring. Data will be collected every {interval_seconds} seconds.")
-    print("Press Ctrl+C to stop.")
-
+    await init_db(conn_string)
     try:
         while True:
             await gather_stats_pipeline()

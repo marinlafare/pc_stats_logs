@@ -1,0 +1,6 @@
+psutil
+GPUtil
+python-dotenv
+SQLAlchemy[asyncio]
+asyncpg
+pydantic

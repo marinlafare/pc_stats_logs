@@ -1,0 +1,48 @@
+# Removed: version: '3.8' (as it's obsolete)
+
+services:
+  # Service for your Python application
+  app:
+    build: . # Build the image using the Dockerfile in the current directory
+    container_name: pc_stats_app
+    # Mount the local .env file into the container
+    env_file:
+      - ./.env
+    # Define the database connection string as an environment variable for the app container
+    environment:
+      CONN_STRING: postgresql+asyncpg://user:password@db:5432/pc_stats
+    depends_on:
+      db:
+        condition: service_healthy # IMPORTANT: Wait until the 'db' service reports as healthy
+    restart: on-failure # Restart the container if it exits with an error
+    # Added entrypoint to introduce a delay and ensure the container stays open
+    # This gives the DB a few extra seconds to stabilize after becoming 'healthy'
+    entrypoint: ["/bin/sh", "-c", "sleep 10 && python main.py"]
+    # Added tty and stdin_open for better interactive debugging if needed
+    tty: true
+    stdin_open: true
+
+  # Service for the PostgreSQL database
+  db:
+    image: postgres:16 # Updated to PostgreSQL version 16
+    container_name: pc_stats # Updated container name to pc_stats
+    environment:
+      POSTGRES_DB: pc_stats # Database name
+      POSTGRES_USER: user     # Database user
+      POSTGRES_PASSWORD: password # CORRECTED: Changed POSTRES_PASSWORD to POSTGRES_PASSWORD
+    volumes:
+      # Persist database data to a named volume to avoid data loss on container removal
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" # Map host port 5432 to container port 5432 (optional, for direct access)
+    restart: unless-stopped # Always restart unless explicitly stopped
+    healthcheck: # Add a health check to ensure the database is ready
+      test: ["CMD-SHELL", "pg_isready -U user -d pc_stats"] # Command to check DB readiness
+      interval: 5s # Check every 5 seconds
+      timeout: 5s # Timeout after 5 seconds
+      retries: 10 # Increased retries to give more chances for DB to become ready
+      start_period: 30s # Increased start_period to give DB more time for initial setup
+
+# Define named volumes for data persistence
+volumes:
+  db_data:
