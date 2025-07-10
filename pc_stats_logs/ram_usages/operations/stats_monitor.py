@@ -113,13 +113,13 @@ async def insert_stats_to_db(stats_list: List[Dict[str, Union[float, int, None]]
     if pc_stats_inserted_count == 0 and gpu_stats_inserted_count == 0:
         print("No valid stats found to insert.")
         
-async def gather_stats_pipeline():
-    try:
-        stats = await get_pc_stats()
-        await insert_stats_to_db(stats)
-    except:
-        return "something happened idk sorry"
-    return
+# async def gather_stats_pipeline():
+#     try:
+#         stats = await get_pc_stats()
+#         await insert_stats_to_db(stats)
+#     except:
+#         return "something happened idk sorry"
+#     return
 
 
 
