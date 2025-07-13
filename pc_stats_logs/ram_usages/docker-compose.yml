@@ -1,42 +1,9 @@
 services:
   app:
     build: .
-    container_name: pc_stats_app
+    container_name: pc_stats_logs_app
     env_file:
-      - ./.env
-    environment:
-      CONN_STRING: postgresql+asyncpg://user:password@db:5432/pc_stats
-    depends_on:
-      db:
-        condition: service_healthy
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: always
-    entrypoint: ["/bin/sh", "-c", "sleep 10 && python main.py"]
-    tty: true
-    stdin_open: true
-    deploy:
-      resources:
-        limits:
-          memory: 50m
-          cpus: '0.1'
-
-  db:
-    image: postgres:16
-    container_name: pc_stats
-    environment:
-      POSTGRES_DB: pc_stats
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d pc_stats"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
-
-volumes:
-  db_data:
