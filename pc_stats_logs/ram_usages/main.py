@@ -16,8 +16,6 @@ async def gather_stats_pipeline():
         stats_list = get_pc_stats()
         if stats_list:
             await insert_stats_to_db(stats_list)
-            print("Stats gathered and inserted successfully.")
-            sys.stdout.flush() # Ensure print is visible immediately
         else:
             print("Failed to gather stats. No data to insert.")
             sys.stdout.flush() # Ensure print is visible immediately
@@ -30,26 +28,17 @@ async def gather_stats_pipeline():
 
 async def main_loop(interval_seconds: int = 10):
     """
-    Main loop to run the stats gathering pipeline periodically.
+    Main loop to run the stats.
 
     Args:
         interval_seconds (int): The time interval (in seconds) between each run.
     """
-    print("DEBUG: Starting main_loop...")
-    sys.stdout.flush() # Ensure print is visible immediately
-
     load_dotenv('.env')
-    print("DEBUG: .env file loaded.")
-    sys.stdout.flush() # Ensure print is visible immediately
-
     conn_string = os.getenv("CONN_STRING")
-    print(f"DEBUG: Retrieved CONN_STRING from environment: {conn_string}")
-    sys.stdout.flush() # Ensure print is visible immediately
 
     if not conn_string:
         print("ERROR: CONN_STRING is not set in the environment. Cannot proceed.")
-        sys.stdout.flush() # Ensure print is visible immediately
-        return # Exit if connection string is missing
+        return
 
     try:
         print("DEBUG: Calling init_db...")

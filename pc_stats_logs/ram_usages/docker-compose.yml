@@ -1,9 +1,15 @@
 services:
   app:
-    build: .
-    container_name: pc_stats_logs_app
+    build: . 
+    container_name: pc_stats_logs_app 
     env_file:
-      - .env
+      - .env 
+
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: always
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - TZ=America/Mexico_City
